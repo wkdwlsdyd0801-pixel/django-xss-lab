@@ -1,0 +1,15 @@
+# Secrets and local config
+.env
+
+# Local database (recreated by `python manage.py migrate`)
+db.sqlite3
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# IDE
+.idea/
+.vscode/

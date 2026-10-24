@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>검색 - 반사형 XSS</title>
+    <style>
+        body { font-family: sans-serif; max-width: 640px; margin: 40px auto; }
+        .vuln { color: #c00; font-weight: bold; }
+        .safe { color: #080; font-weight: bold; }
+        code { background: #f4f4f4; padding: 2px 4px; word-break: break-all; }
+    </style>
+</head>
+<body>
+    <h2>검색
+        {% if mode == "vulnerable" %}<span class="vuln">❌ 취약 모드</span>
+        {% else %}<span class="safe">✅ 안전 모드</span>{% endif %}
+    </h2>
+    <p>URL의 <code>?q=</code> 값을 그대로 화면에 되돌려 줍니다 (reflected XSS).</p>
+    <p>
+        <a href="?mode=vulnerable&q=<script>alert('reflected XSS')</script>">❌ 공격 URL 열기</a> |
+        <a href="?mode=safe&q=<script>alert('reflected XSS')</script>">✅ 안전 모드로 같은 URL</a> |
+        <a href="{% url 'board' %}?mode=vulnerable">저장형 XSS 데모</a>
+    </p>
+    <hr>
+
+    <form method="GET" action="?">
+        <input type="hidden" name="mode" value="{{ mode }}">
+        <input type="text" name="q" value="{{ query }}" placeholder="검색어">
+        <button type="submit">검색</button>
+    </form>
+    <hr>
+
+    {# "echo" is mark_safe() in vulnerable mode (raw HTML runs) and a plain
+       string in safe mode (auto-escaped, shown as text). #}
+    <p>검색 결과: {{ echo }}</p>
+</body>
+</html>

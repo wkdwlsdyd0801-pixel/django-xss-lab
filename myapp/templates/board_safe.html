@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>게시판 - 안전 모드</title>
+    <style>
+        body { font-family: sans-serif; max-width: 640px; margin: 40px auto; }
+        .post { border: 1px solid #999; padding: 8px 12px; margin: 8px 0; }
+        .meta { color: #666; font-size: 0.85em; }
+        textarea { width: 100%; height: 60px; }
+        .mode { color: #080; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2>게시판 <span class="mode">✅ 안전 모드 (escape + CSP)</span></h2>
+    <p>저장된 글을 <code>{{ post.content }}</code>로 출력합니다. 자동 이스케이프로 태그가 글자로 보이고, CSP 헤더가 인라인 스크립트를 한 번 더 차단합니다.</p>
+    <p><a href="?mode=vulnerable">❌ 취약 모드로 보기</a> | <a href="{% url 'search' %}?mode=safe">반사형 XSS 데모</a></p>
+    <hr>
+
+    <form method="POST" action="?mode=safe">
+        {% csrf_token %}
+        <p>작성자: <input type="text" name="author"></p>
+        <p>내용: <textarea name="content"></textarea></p>
+        <button type="submit">등록</button>
+    </form>
+    <hr>
+
+    {% for post in posts %}
+        <div class="post">
+            <div class="meta">#{{ post.id }} · {{ post.author }} · {{ post.created_at }}</div>
+            {# Plain {{ }} is auto-escaped by Django: < becomes &lt;, so it is shown, not run. #}
+            <div>{{ post.content }}</div>
+        </div>
+    {% empty %}
+        <p>글이 없습니다.</p>
+    {% endfor %}
+</body>
+</html>
